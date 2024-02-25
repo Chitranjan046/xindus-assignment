@@ -1,5 +1,4 @@
 const WishlistItem = require('../models/WishlistItem');
-
 // Controller methods for wishlist management
 exports.getAllWishlistItems = async (req, res) => {
   try {
@@ -41,3 +40,5 @@ exports.deleteWishlistItem = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
+
