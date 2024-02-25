@@ -6,9 +6,14 @@ const connectDB = require('./config/db');
 const app = express();
 app.use(cors());
 connectDB();
+
+// Middleware
 app.use(express.json());
 
 
+
+// Routes
+app.use('/api/wishlists', require('./routes/wishlistRoutes'));
 
 
 
