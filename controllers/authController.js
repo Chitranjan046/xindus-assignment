@@ -1,57 +1,64 @@
-const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
-const registerUser = async (req, res) => {
+exports.register = async (req, res) => {
   const { username, password } = req.body;
-  
+
   try {
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Please provide username and password' });
+    // Check if the username is already taken
+    let user = await User.findOne({ username });
+    if (user) {
+      return res.status(400).json({ message: 'Username already exists' });
     }
 
-    // Check if the username already exists
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ error: 'Username already exists' });
-    }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    const hashpassword = await bcrypt.hash(password, 10);
+    console.log(hashpassword, password);
+      // Store hash in your password DB.
+  
     // Create a new user
-    const newUser = new User({ username, password: hashedPassword });
-    await newUser.save();
+    user = new User({ username, password:hashpassword});
+    await user.save();
 
     res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
-const loginUser = async (req, res) => {
+exports.login = async (req, res) => {
   const { username, password } = req.body;
-  
-  try {
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Please provide username and password' });
-    }
 
+  try {
     // Check if the user exists
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Compare passwords
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    // Check if the password is correct
+    // const isValidPassword = await user.isValidPassword(password);
+    // if (!isValidPassword) {
+    //   return res.status(401).json({ message: 'Invalid credentials' });
+    // }
+   
+
+    // Load hash from your password DB.
+      const hashpassword = await bcrypt.compare(password, user.password );
+      if(hashpassword){
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(201).json({ token });
+
     }
 
-    res.json({ message: 'User logged in successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    // Generate JWT token
+    // 
+
+   
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
-module.exports = { registerUser, loginUser };
+
