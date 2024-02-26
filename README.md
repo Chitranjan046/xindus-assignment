@@ -10,7 +10,20 @@ Backend for wishlist management feature
 
 ## Testing
 
-To run tests, execute: `npm test`
+To run tests, execute: `npm test` It's recommended to thoroughly test each API endpoint using tools like Postman.
+
+## Locally
+
+## Authentication
+
+- **POST /auth/register**: Signup 
+- **POST /auth/login**: Login
+## Wishlists
+
+- **POST /api/wishlists/**: Create Whitlists Item
+- **GET /api/wishlists/**: Retrive Whitlists Item
+- **Delete /api/wishlists/:id**: Delete Whitlists Item
+
 
 ## Folder Structure
 
